@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 var nodemailer = require("nodemailer");
 const expressAsyncHandler = require("express-async-handler");
+const Farm = require("../model/farmSchema");
 
 const sendEmailverify = (to, name, code) => {
   var transporter = nodemailer.createTransport({
@@ -248,7 +249,9 @@ const setUp = expressAsyncHandler(async (req, res, next) => {
       })
       .lean();
 
-    res.status(200).json({ message: "user fetched successfully", user });
+    const farms = await Farm.find({});
+
+    res.status(200).json({ message: "user fetched successfully", user, farms });
   } catch (error) {
     next(error);
   }
