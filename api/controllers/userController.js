@@ -257,6 +257,25 @@ const setUp = expressAsyncHandler(async (req, res, next) => {
   }
 });
 
+const resendOtp = expressAsyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await userSchema.findOne({ email: email });
+    if (!user) {
+      throw new Error("user not found");
+    }
+    let code = generateCode();
+
+    await CodeSchema.updateOne({ userId: user._id }, { code: code });
+
+    sendEmailverify(email, user.firstname, code);
+
+    res.status(200).json({ message: "Otp sent successfully to your email" });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = {
   createUser,
   getAllUser,
@@ -264,4 +283,5 @@ module.exports = {
   getUserByEmail,
   verifyCode,
   setUp,
+  resendOtp,
 };
